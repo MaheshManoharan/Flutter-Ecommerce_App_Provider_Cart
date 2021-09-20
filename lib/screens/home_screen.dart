@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:oman_phone_2/api/rest_api.dart';
+import 'package:oman_phone_2/models/product.dart';
+import 'package:oman_phone_2/widgets/grid_item.dart';
 import '../models/slidedata.dart' as sl;
 
 class HomeScreen extends StatefulWidget {
@@ -11,21 +13,124 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<sl.Slider>> _sliderlist;
+  Future<List<Item>> _griditems;
+
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _sliderlist = ApiService.getCarouselData();
+    _griditems = ApiService.getGridProducts();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(slivers: [
+        //appbar
         _buildAppBar2(),
+        //carousel slider
         _buildCarouselSlider(),
+//empty space
+        _buildSizedBox(),
+//mobile phones view all
+        _buildMobileViewall(),
+//gridview
+        _buildGridView(),
+
+       // _buildBanner(),
       ]),
+      //bottombar
+      bottomNavigationBar: _buildBottomBar(),
     );
+  }
+
+  FutureBuilder<List<Item>> _buildGridView() {
+    return FutureBuilder<List<Item>>(
+      future: _griditems,
+      builder: (context, snapshot) => !snapshot.hasData
+          ? SliverToBoxAdapter(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          : SliverGrid(
+              gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return GridItem(item: snapshot.data[index]);
+                },
+                childCount: snapshot.data.length,
+              ),
+            ),
+    );
+  }
+
+  SliverToBoxAdapter _buildMobileViewall() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Mobile Phones',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: Text('VIEW  ALL'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildSizedBox() {
+    return SliverToBoxAdapter(
+      child: SizedBox(height: 20.0),
+    );
+  }
+
+  BottomNavigationBar _buildBottomBar() {
+    return BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: onTabTapped,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        items: [
+          BottomNavigationBarItem(
+            label: 'Home',
+            icon: Icon(Icons.home),
+          ),
+          BottomNavigationBarItem(
+            label: 'Search',
+            icon: Icon(Icons.search),
+          ),
+          BottomNavigationBarItem(
+            label: 'Categories',
+            icon: Icon(
+              Icons.category,
+            ),
+          ),
+          BottomNavigationBarItem(
+            label: 'Cart',
+            icon: Icon(
+              Icons.shopping_cart,
+            ),
+          ),
+        ]);
+  }
+
+  void onTabTapped(int value) {
+    setState(() {
+      _currentIndex = value;
+    });
   }
 
   _buildCarouselSlider() {
