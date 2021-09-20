@@ -58,4 +58,30 @@ class ApiService {
       }
     } catch (error) {}
   }
+
+  static Future<String> getBanner() async {
+    var response = await http.get('${URLS.BASE_URL}/api/homepage');
+
+    try {
+      if (response.statusCode == 200) {
+        final gridProducts = productFromJson(response.body);
+        return gridProducts[3].data.file;
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  static Future<List<Item>> getNewArrivals() async {
+    var response = await http.get('${URLS.BASE_URL}/api/homepage');
+
+    try {
+      if (response.statusCode == 200) {
+        final arrivalGridProducts = productFromJson(response.body);
+        return arrivalGridProducts[4].data.items;
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
 }

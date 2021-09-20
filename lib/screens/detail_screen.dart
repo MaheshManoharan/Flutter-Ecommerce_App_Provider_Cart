@@ -46,6 +46,9 @@ class _DetailScreenState extends State<DetailScreen> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          SizedBox(
+            height: 4.0,
+          ),
           _topImage(item),
           SizedBox(
             height: 8.0,
@@ -102,8 +105,6 @@ class _DetailScreenState extends State<DetailScreen> {
                   FutureBuilder<List<sim.Item>>(
                       future: _similarItems,
                       builder: (context, snapshot) {
-                        
-
                         if (snapshot.hasData) {
                           return Expanded(
                             child: GridView.builder(
@@ -125,7 +126,6 @@ class _DetailScreenState extends State<DetailScreen> {
                             child: CircularProgressIndicator(),
                           );
                         }
-                        
                       }),
                 ],
               ),
@@ -172,7 +172,7 @@ class _DetailScreenState extends State<DetailScreen> {
           Column(
             children: [
               Icon(Icons.memory),
-              Text(item.storage),
+              if (item.storage != false) Text(item.storage),
             ],
           ),
           Column(
@@ -247,10 +247,7 @@ class _DetailScreenState extends State<DetailScreen> {
       Container(
         width: double.infinity,
         height: 250,
-        child: Hero(
-            tag: item.image,
-            child:
-                CachedNetworkImage(imageUrl: '${URLS.MEDIA_URL}${item.image}')),
+        child: CachedNetworkImage(imageUrl: '${URLS.MEDIA_URL}${item.image}'),
       ),
       Positioned(
         top: 10,

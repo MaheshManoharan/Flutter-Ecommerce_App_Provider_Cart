@@ -13,7 +13,6 @@ class GridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-
         //when the grid item taps, moves to detailscreen
         Navigator.push(
           context,
@@ -32,26 +31,24 @@ class GridItem extends StatelessWidget {
                 children: [
                   Container(
                     width: 90,
-                    child: Hero(
-                      tag: item.image,
-                      child: CachedNetworkImage(
-                        imageUrl: '${URLS.MEDIA_URL}${item.image}',
-                        //  fit: BoxFit.cover,
-                      ),
+                    child: CachedNetworkImage(
+                      imageUrl: '${URLS.MEDIA_URL}${item.image}',
+                      //  fit: BoxFit.cover,
                     ),
                   ),
-                  Positioned(
-                    right: 1,
-                    bottom: 30,
-                    child: Text(
-                      item.storage,
-                      style: TextStyle(
-                        backgroundColor: Colors.white,
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
+                  if (item.storage != false)
+                    Positioned(
+                      right: 1,
+                      bottom: 30,
+                      child: Text(
+                        item.storage,
+                        style: TextStyle(
+                          backgroundColor: Colors.white,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
                   item.rating != null
                       ? Positioned(
                           left: 1,

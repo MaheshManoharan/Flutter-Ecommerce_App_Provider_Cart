@@ -36,7 +36,7 @@ class CartScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                   child: Text(
-                    '${cartProvider.totalAmount}',
+                    '${cartProvider.totalAmount.roundToDouble()}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,

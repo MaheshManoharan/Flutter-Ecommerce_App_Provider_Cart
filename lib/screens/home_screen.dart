@@ -14,6 +14,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Future<List<sl.Slider>> _sliderlist;
   Future<List<Item>> _griditems;
+  Future<String> _banner;
+  Future<List<Item>> _newArrivalItems;
 
   int _currentIndex = 0;
 
@@ -22,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _sliderlist = ApiService.getCarouselData();
     _griditems = ApiService.getGridProducts();
+    _banner = ApiService.getBanner();
+    _newArrivalItems = ApiService.getNewArrivals();
   }
 
   @override
@@ -29,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: CustomScrollView(slivers: [
         //appbar
-        _buildAppBar2(),
+        _buildAppBar3(),
         //carousel slider
         _buildCarouselSlider(),
 //empty space
@@ -38,11 +42,54 @@ class _HomeScreenState extends State<HomeScreen> {
         _buildMobileViewall(),
 //gridview
         _buildGridView(),
-
-       // _buildBanner(),
+//iphone banner,
+        _buildBanner(),
+        // new arrivals grid
+        _buildNewArrivals(),
+//new arrivals
+        _buildGridView2(),
       ]),
       //bottombar
       bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+
+  SliverToBoxAdapter _buildBanner() {
+    return SliverToBoxAdapter(
+      child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FutureBuilder(
+            future: _banner,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return CachedNetworkImage(imageUrl: snapshot.data);
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          )),
+    );
+  }
+
+  FutureBuilder<List<Item>> _buildGridView2() {
+    return FutureBuilder<List<Item>>(
+      future: _newArrivalItems,
+      builder: (context, snapshot) => !snapshot.hasData
+          ? SliverToBoxAdapter(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          : SliverGrid(
+              gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return GridItem(item: snapshot.data[index]);
+                },
+                childCount: snapshot.data.length,
+              ),
+            ),
     );
   }
 
@@ -65,6 +112,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 childCount: snapshot.data.length,
               ),
             ),
+    );
+  }
+
+  SliverToBoxAdapter _buildNewArrivals() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'New Arrivals',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: Text('VIEW  ALL'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -164,6 +234,60 @@ class _HomeScreenState extends State<HomeScreen> {
           }),
     ));
   }
+}
+
+SliverAppBar _buildAppBar3() {
+  return SliverAppBar(
+    stretch: true,
+    toolbarHeight: 45.0 + kToolbarHeight,
+    title: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+              onPressed: () {},
+            ),
+            Text('OMAN PHONE'),
+            IconButton(
+              icon: Icon(
+                Icons.notifications,
+                color: Colors.white,
+              ),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 12.0,
+            bottom: 12.0,
+            left: 8.0,
+            right: 8.0,
+          ),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(5.0)),
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: "Search products...",
+                border: InputBorder.none,
+                icon: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+    centerTitle: true,
+    backgroundColor: Colors.red,
+    pinned: true,
+  );
 }
 
 SliverAppBar _buildAppBar2() {
