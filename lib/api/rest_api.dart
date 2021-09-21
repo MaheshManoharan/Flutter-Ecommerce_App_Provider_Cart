@@ -1,4 +1,5 @@
 import 'package:oman_phone_2/models/product.dart';
+import 'package:oman_phone_2/models/product_details.dart';
 import '../models/slidedata.dart';
 import 'package:http/http.dart' as http;
 import '../models/similar_list.dart' as sim;
@@ -79,6 +80,20 @@ class ApiService {
       if (response.statusCode == 200) {
         final arrivalGridProducts = productFromJson(response.body);
         return arrivalGridProducts[4].data.items;
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  static Future<Attrs> getAttrs(int id) async {
+    var response = await http.get('${URLS.BASE_URL}/api/productdetails?id=$id');
+
+    try {
+      if (response.statusCode == 200) {
+        final productDetails = productDetailsFromJson(response.body);
+
+        return productDetails.attrs;
       }
     } catch (error) {
       print(error);

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:oman_phone_2/api/rest_api.dart';
 import 'package:oman_phone_2/models/product.dart';
+import 'package:oman_phone_2/models/product_details.dart';
 import 'package:oman_phone_2/providers/cart_provider.dart';
 import 'package:oman_phone_2/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -20,12 +21,15 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   Future<List<sim.Item>> _similarItems;
-
+  Future<Attrs> _attrs;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _similarItems = ApiService.getSimilarProducts(
+      int.parse(widget.item.id),
+    );
+
+    _attrs = ApiService.getAttrs(
       int.parse(widget.item.id),
     );
   }
@@ -45,6 +49,7 @@ class _DetailScreenState extends State<DetailScreen> {
   SingleChildScrollView _detailBody(Item item) {
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             height: 4.0,
@@ -54,89 +59,213 @@ class _DetailScreenState extends State<DetailScreen> {
             height: 8.0,
           ),
           _titleAndContent(item),
+          if (item.rating != null) _latestRating(item),
           _priceAndSpecialPrice(item),
-          _specifics(item),
-          _specifics2(item),
-          Card(
-            child: Container(
-              height: 85,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text(
-                      'About Products',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      'View  details...',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Card(
-            child: Container(
-              width: double.infinity,
-              height: 230,
-              child: Column(
-                //mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text(
-                      'Similar Products',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  FutureBuilder<List<sim.Item>>(
-                      future: _similarItems,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Expanded(
-                            child: GridView.builder(
-                                shrinkWrap: true,
-                                primary: false,
-                                itemCount: snapshot.data.length,
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2),
-                                itemBuilder: (context, index) {
-                                  //return Text(snapshot.data[index].name);
-
-                                  return SimilarGridItem(
-                                      item: snapshot.data[index]);
-                                }),
-                          );
-                        } else {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                      }),
-                ],
-              ),
-            ),
-          ),
+          _colorSpecifics(),
+          _storageSpecifics(),
+          _aboutProducts(),
+          _similarProducts(),
           SizedBox(
             height: 10,
           ),
         ],
       ),
     );
+  }
+
+  SizedBox _latestRating(Item item) {
+    return SizedBox(
+      child: Container(
+        margin: EdgeInsets.only(
+          left: 8.0,
+          bottom: 8.0,
+        ),
+        height: 20,
+        width: 40,
+        decoration: BoxDecoration(
+          color: Colors.amber[500],
+          borderRadius: BorderRadius.all(
+            Radius.circular(10),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            '⭐${item.rating}',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  FutureBuilder<Attrs> _storageSpecifics() {
+    return FutureBuilder(
+        future: _attrs,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasData) {
+            final attrs = snapshot.data;
+            if (attrs.specs.length > 0)
+              return Container(
+                margin: EdgeInsets.all(8.0),
+                height: 100,
+                width: 100,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      children: [
+                        CachedNetworkImage(
+                          width: 30,
+                          height: 30,
+                          imageUrl: attrs.specs[0].icon,
+                          fit: BoxFit.cover,
+                        ),
+                        Text('${attrs.specs[0].value}'),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+          } else {
+            return SizedBox();
+          }
+          return SizedBox();
+        });
+  }
+
+  Card _similarProducts() {
+    return Card(
+      child: Container(
+        width: double.infinity,
+        height: 230,
+        child: Column(
+          //mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                'Similar Products',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            FutureBuilder<List<sim.Item>>(
+                future: _similarItems,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  if (snapshot.hasData) {
+                    return Expanded(
+                      child: GridView.builder(
+                          shrinkWrap: true,
+                          primary: false,
+                          itemCount: snapshot.data.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2),
+                          itemBuilder: (context, index) {
+                            //return Text(snapshot.data[index].name);
+
+                            return SimilarGridItem(item: snapshot.data[index]);
+                          }),
+                    );
+                  } else {
+                    return Center(child: Text('No \n similar \n products'));
+                  }
+                }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Card _aboutProducts() {
+    return Card(
+      child: Container(
+        height: 85,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                'About Products',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                'View  details...',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  FutureBuilder<Attrs> _colorSpecifics() {
+    return FutureBuilder(
+        future: _attrs,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final attrs = snapshot.data;
+
+            print(attrs.specs[0].icon);
+            final color = attrs.color;
+
+            if (color.length >= 4) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 35,
+                  child: Container(
+                    color: Colors.grey[400],
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                          'color',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey),
+                        ),
+                        SizedBox(width: 20),
+                        CachedNetworkImage(imageUrl: color),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            return SizedBox();
+          } else {
+            return SizedBox();
+          }
+        });
   }
 
   Row _specifics2(Item item) {
@@ -229,16 +358,16 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  ListTile _titleAndContent(Item item) {
-    return ListTile(
-      title: Text(
+  Widget _titleAndContent(Item item) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Text(
         item.name,
         textAlign: TextAlign.left,
         style: TextStyle(
           fontWeight: FontWeight.bold,
         ),
       ),
-      subtitle: item.rating != null ? Text(item.rating) : Text(''),
     );
   }
 
@@ -309,6 +438,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
+      centerTitle: true,
       title: Text('Item Details'),
       actions: [
         Consumer<CartProvider>(

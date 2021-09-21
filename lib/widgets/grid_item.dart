@@ -49,6 +49,9 @@ class GridItem extends StatelessWidget {
                         ),
                       ),
                     ),
+                  SizedBox(
+                    width: 10,
+                  ),
                   item.rating != null
                       ? Positioned(
                           left: 1,
@@ -61,7 +64,7 @@ class GridItem extends StatelessWidget {
                               //color: Colors.black,
                             ),
                             child: Text(
-                              '🌟${item.rating}',
+                              '⭐${item.rating}',
                               style: TextStyle(
                                   backgroundColor: Colors.yellow,
                                   color: Colors.red,

@@ -32,10 +32,13 @@ class CartItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
-                    cartItemName,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      cartItemName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -53,11 +56,14 @@ class CartItem extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'OMR: $price',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'OMR: $price',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 IconButton(
