@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:oman_phone_2/api/rest_api.dart';
+import 'package:oman_phone_2/config/size_config.dart';
 import 'package:oman_phone_2/models/product.dart';
 import 'package:oman_phone_2/models/product_details.dart';
 import 'package:oman_phone_2/providers/cart_provider.dart';
@@ -39,6 +40,8 @@ class _DetailScreenState extends State<DetailScreen> {
     final cart = Provider.of<CartProvider>(context, listen: false);
     final item = widget.item;
 
+    SizeConfig().init(context);
+
     return Scaffold(
       appBar: _buildAppBar(context),
       body: _detailBody(item),
@@ -52,11 +55,11 @@ class _DetailScreenState extends State<DetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: 4.0,
+            height: SizeConfig.blockSizeVertical * 1,
           ),
           _topImage(item),
           SizedBox(
-            height: 8.0,
+            height: SizeConfig.blockSizeVertical * 1,
           ),
           _titleAndContent(item),
           if (item.rating != null) _latestRating(item),
@@ -80,8 +83,8 @@ class _DetailScreenState extends State<DetailScreen> {
           left: 8.0,
           bottom: 8.0,
         ),
-        height: 20,
-        width: 40,
+        height: SizeConfig.blockSizeVertical * 2,
+        width: SizeConfig.blockSizeHorizontal * 10,
         decoration: BoxDecoration(
           color: Colors.amber[500],
           borderRadius: BorderRadius.all(
@@ -113,8 +116,8 @@ class _DetailScreenState extends State<DetailScreen> {
             if (attrs.specs.length > 0)
               return Container(
                 margin: EdgeInsets.all(8.0),
-                height: 100,
-                width: 100,
+                height: SizeConfig.blockSizeVertical * 10,
+                width: SizeConfig.blockSizeVertical * 10,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,8 +125,8 @@ class _DetailScreenState extends State<DetailScreen> {
                     Column(
                       children: [
                         CachedNetworkImage(
-                          width: 30,
-                          height: 30,
+                          width: SizeConfig.blockSizeHorizontal * 8,
+                          height: SizeConfig.blockSizeVertical * 5,
                           imageUrl: attrs.specs[0].icon,
                           fit: BoxFit.cover,
                         ),
@@ -144,7 +147,7 @@ class _DetailScreenState extends State<DetailScreen> {
     return Card(
       child: Container(
         width: double.infinity,
-        height: 230,
+        height: SizeConfig.blockSizeVertical * 33,
         child: Column(
           //mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,24 +169,32 @@ class _DetailScreenState extends State<DetailScreen> {
                       child: CircularProgressIndicator(),
                     );
                   }
-
-                  if (snapshot.hasData) {
-                    return Expanded(
-                      child: GridView.builder(
-                          shrinkWrap: true,
-                          primary: false,
-                          itemCount: snapshot.data.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2),
-                          itemBuilder: (context, index) {
-                            //return Text(snapshot.data[index].name);
-
-                            return SimilarGridItem(item: snapshot.data[index]);
-                          }),
-                    );
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data.length > 0) {
+                        return Expanded(
+                          child: GridView.builder(
+                              shrinkWrap: true,
+                              primary: false,
+                              itemCount: snapshot.data.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2),
+                              itemBuilder: (context, index) {
+                                return SimilarGridItem(
+                                    item: snapshot.data[index]);
+                              }),
+                        );
+                      } else {
+                        return Center(child: Text('No \n similar \n products'));
+                      }
+                    } else {
+                      return Center(child: Text('No \n similar \n products'));
+                    }
                   } else {
-                    return Center(child: Text('No \n similar \n products'));
+                    return Center(
+                      child: Text('No similar products'),
+                    );
                   }
                 }),
           ],
@@ -195,7 +206,7 @@ class _DetailScreenState extends State<DetailScreen> {
   Card _aboutProducts() {
     return Card(
       child: Container(
-        height: 85,
+        height: SizeConfig.blockSizeVertical * 12,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -230,7 +241,7 @@ class _DetailScreenState extends State<DetailScreen> {
           if (snapshot.hasData) {
             final attrs = snapshot.data;
 
-            print(attrs.specs[0].icon);
+            //  print(attrs.specs[0].icon);
             final color = attrs.color;
 
             if (color.length >= 4) {
@@ -268,70 +279,15 @@ class _DetailScreenState extends State<DetailScreen> {
         });
   }
 
-  Row _specifics2(Item item) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Column(
-          children: [
-            Icon(
-              Icons.memory_rounded,
-            ),
-            Text('8GB')
-          ],
-        ),
-        Column(
-          children: [
-            Icon(
-              Icons.screenshot_sharp,
-            ),
-            Text('6.1')
-          ],
-        ),
-      ],
-    );
-  }
-
-  Padding _specifics(Item item) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Column(
-            children: [
-              Icon(Icons.memory),
-              if (item.storage != false) Text(item.storage),
-            ],
-          ),
-          Column(
-            children: [
-              Icon(
-                Icons.battery_full,
-              ),
-              Text('5000mah'),
-            ],
-          ),
-          Column(
-            children: [
-              Icon(Icons.camera),
-              Text('20 MP'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Padding _priceAndSpecialPrice(Item item) {
     return Padding(
-      padding: const EdgeInsets.only(left: 12.0),
+      padding: const EdgeInsets.only(left: 8.0),
       child: Row(
         children: [
           if (item.specialPrice != null)
             Row(
               children: [
-                Text('OMR${item.specialPrice.roundToDouble()}',
+                Text('OMR ${item.specialPrice.roundToDouble()}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
@@ -344,6 +300,7 @@ class _DetailScreenState extends State<DetailScreen> {
           Text(
             'OMR ${item.price.roundToDouble()}',
             style: TextStyle(
+              color: item.specialPrice == null ? Colors.red : Colors.grey,
               decoration: item.specialPrice != null
                   ? TextDecoration.lineThrough
                   : TextDecoration.none,
@@ -375,7 +332,7 @@ class _DetailScreenState extends State<DetailScreen> {
     return Stack(children: [
       Container(
         width: double.infinity,
-        height: 250,
+        height: SizeConfig.blockSizeVertical * 30,
         child: CachedNetworkImage(imageUrl: '${URLS.MEDIA_URL}${item.image}'),
       ),
       Positioned(
@@ -462,3 +419,57 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 }
+ // Row _specifics2(Item item) {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //     children: [
+  //       Column(
+  //         children: [
+  //           Icon(
+  //             Icons.memory_rounded,
+  //           ),
+  //           Text('8GB')
+  //         ],
+  //       ),
+  //       Column(
+  //         children: [
+  //           Icon(
+  //             Icons.screenshot_sharp,
+  //           ),
+  //           Text('6.1')
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
+
+  // Padding _specifics(Item item) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(8.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //       children: [
+  //         Column(
+  //           children: [
+  //             Icon(Icons.memory),
+  //             if (item.storage != false) Text(item.storage),
+  //           ],
+  //         ),
+  //         Column(
+  //           children: [
+  //             Icon(
+  //               Icons.battery_full,
+  //             ),
+  //             Text('5000mah'),
+  //           ],
+  //         ),
+  //         Column(
+  //           children: [
+  //             Icon(Icons.camera),
+  //             Text('20 MP'),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }

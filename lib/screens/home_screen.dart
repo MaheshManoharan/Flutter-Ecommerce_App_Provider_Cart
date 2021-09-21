@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:oman_phone_2/api/rest_api.dart';
+import 'package:oman_phone_2/config/size_config.dart';
 import 'package:oman_phone_2/models/product.dart';
 import 'package:oman_phone_2/widgets/grid_item.dart';
 import '../models/slidedata.dart' as sl;
@@ -30,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+
     return Scaffold(
       body: CustomScrollView(slivers: [
         //appbar
@@ -163,9 +166,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   SliverToBoxAdapter _buildSizedBox() {
     return SliverToBoxAdapter(
-      child: SizedBox(height: 20.0),
+      child: SizedBox(height: SizeConfig.blockSizeVertical * 2),
     );
   }
+  
 
   BottomNavigationBar _buildBottomBar() {
     return BottomNavigationBar(
@@ -206,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
   _buildCarouselSlider() {
     return SliverToBoxAdapter(
         child: SizedBox(
-      height: 200,
+      height: SizeConfig.blockSizeVertical * 28,
       child: FutureBuilder<List<sl.Slider>>(
           future: _sliderlist,
           builder: (context, snapshot) {
@@ -239,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
 SliverAppBar _buildAppBar3() {
   return SliverAppBar(
     stretch: true,
-    toolbarHeight: 45.0 + kToolbarHeight,
+    toolbarHeight: SizeConfig.blockSizeVertical * 8 + kToolbarHeight,
     title: Column(
       children: [
         Row(
@@ -270,7 +274,7 @@ SliverAppBar _buildAppBar3() {
             // right: 4.0,
           ),
           child: Container(
-            height: 40,
+            height: SizeConfig.blockSizeVertical * 6,
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(5.0)),
             child: TextField(

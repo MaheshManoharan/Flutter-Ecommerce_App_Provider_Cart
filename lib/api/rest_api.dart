@@ -52,7 +52,7 @@ class ApiService {
 
     try {
       if (response.statusCode == 200) {
-        print(response.body);
+       
         final similarProductModel = sim.similarListFromJson(response.body);
 
         return similarProductModel.items;

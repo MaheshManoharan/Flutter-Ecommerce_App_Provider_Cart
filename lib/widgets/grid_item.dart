@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:oman_phone_2/api/rest_api.dart';
+import 'package:oman_phone_2/config/size_config.dart';
 import 'package:oman_phone_2/models/product.dart';
 import 'package:oman_phone_2/screens/screens.dart';
 
@@ -11,6 +13,7 @@ class GridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return InkWell(
       onTap: () {
         //when the grid item taps, moves to detailscreen
@@ -26,11 +29,11 @@ class GridItem extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 120,
+              height: SizeConfig.blockSizeVertical * 14,
               child: Stack(
                 children: [
                   Container(
-                    width: 90,
+                    width: SizeConfig.blockSizeHorizontal * 25, //90
                     child: CachedNetworkImage(
                       imageUrl: '${URLS.MEDIA_URL}${item.image}',
                       //  fit: BoxFit.cover,
@@ -50,7 +53,7 @@ class GridItem extends StatelessWidget {
                       ),
                     ),
                   SizedBox(
-                    width: 10,
+                    width: SizeConfig.blockSizeHorizontal * 5, //10
                   ),
                   item.rating != null
                       ? Positioned(
@@ -77,22 +80,46 @@ class GridItem extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+              padding: const EdgeInsets.only(left: 6.0, right: 6.0, top: 8.0),
               child: Text(
                 item.name,
+                textAlign: TextAlign.center,
                 maxLines: 2,
                 style: TextStyle(fontSize: 12),
               ),
             ),
             SizedBox(
-              height: 10,
+              height: SizeConfig.blockSizeVertical * 1,
             ),
-            Text(
-              item.price.toString(),
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: item.specialPrice == null
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: item.specialPrice == null
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.start,
+              children: [
+                if (item.specialPrice != null)
+                  Text(
+                    'OMR ${item.specialPrice.toDouble()}',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                Text(
+                  'OMR ${item.price.toDouble()}',
+                  style: item.specialPrice != null
+                      ? TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey,
+                        )
+                      : TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                ),
+              ],
             )
           ],
         ),

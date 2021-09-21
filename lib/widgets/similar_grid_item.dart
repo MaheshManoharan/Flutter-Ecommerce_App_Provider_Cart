@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:oman_phone_2/api/rest_api.dart';
+import 'package:oman_phone_2/config/size_config.dart';
 import 'package:oman_phone_2/models/similar_list.dart';
 
 class SimilarGridItem extends StatelessWidget {
@@ -51,19 +52,23 @@ class SimilarGridItem extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-              child: Text(
-                item.name,
-                maxLines: 2,
-                style: TextStyle(fontSize: 12),
+            Expanded(
+              child: Padding(
+                padding:
+                    const EdgeInsets.only(left: 10.0, right: 10.0, top: 8.0),
+                child: Text(
+                  item.name,
+                  textAlign: TextAlign.center,
+                  //1maxLines: 2,
+                  style: TextStyle(fontSize: 12),
+                ),
               ),
             ),
             SizedBox(
-              height: 10,
+              height: SizeConfig.blockSizeVertical * 2,
             ),
             Text(
-              item.price.toString(),
+              'OMR ${item.price.toDouble()}',
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
