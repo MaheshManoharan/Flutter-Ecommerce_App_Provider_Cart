@@ -1,6 +1,6 @@
 # oman_phone_2
 
-A new Flutter project - Ecommerce app done for interview task.
+A new Flutter project - Ecommerce app done for interview task. Rest Api + Heart Icon Animation + Add To Cart + Full Cart features
 
 ## screenshots!
 
