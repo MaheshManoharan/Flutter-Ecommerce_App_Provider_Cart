@@ -1,6 +1,10 @@
 # oman_phone_2
 
-A new Flutter project.
+A new Flutter project - Ecommerce app done for interview task.
+
+## screenshots
+
+
 
 ## Getting Started
 
