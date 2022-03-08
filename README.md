@@ -1,6 +1,6 @@
 # Ecommerce App - Rest Api + Heart Icon Animation + Add To Cart + Full Cart features.
 
-A new Flutter project - Ecommerce app done for interview task. 
+A new Flutter project - Ecommerce app done for interview task. This app helps to show product items in well structured and nice UI design. App is build upon REST api with Provider package. User can add products to cart and also calculate price. Love animation included for picking favorite.
 
 ## screenshots!
 
